@@ -1,39 +1,38 @@
-struct mfw_rule {
-    int in;
-    int ip_version;
+#ifndef __MFW_H__
+#define __MFW_H__
 
-    uint32_t s_ip;
-    struct in6_addr s_ip6;
+#include <cstdint>
+#include <netinet/in.h>
 
-    uint32_t s_mask;
-    struct in6_addr s_mask6;
+#define DEVICE_INTF_NAME "/dev/mfw_dev"
 
-    uint16_t s_port;
-    uint16_t s_port6;
-
-    uint32_t d_ip;
-    struct in6_addr d_ip6;
-
-    uint32_t d_mask;
-    struct in6_addr d_mask6;
-
-    uint16_t d_port;
-    uint16_t d_port6;
-
-    uint8_t proto;
+enum {
+    MFW_NONE = 0,
+    MFW_ADD,
+    MFW_REMOVE,
+    MFW_VIEW,
 };
 
-#define IP_VERSION_4 4
-#define IP_VERSION_6 6
+// Dual-stack IP Support (IPv4 or IPv6)
+struct mfw_rule {
+    int in;  // Direction: 1 = In, 0 = Out
+
+    // IPv4/IPv6 agnostic addresses
+    uint8_t s_ip[16];    // Source IP
+    uint8_t s_mask[16];  // Source Mask
+    uint16_t s_port;
+
+    uint8_t d_ip[16];    // Destination IP
+    uint8_t d_mask[16];  // Destination Mask
+    uint16_t d_port;
+
+    uint8_t proto; // Protocol (TCP/UDP)
+    uint8_t ip_version; // 4 or 6
+};
 
 struct mfw_ctl {
-    int mode;
+    int mode;            // MFW_ADD, MFW_REMOVE, MFW_VIEW
     struct mfw_rule rule;
 };
 
-#define MFW_NONE 0
-#define MFW_ADD 1
-#define MFW_REMOVE 2
-#define MFW_VIEW 3
-
-#define DEVICE_INTF_NAME "/dev/mfw"  // Or whatever your char device is
+#endif
